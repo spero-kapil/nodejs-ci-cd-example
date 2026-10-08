@@ -1,0 +1,37 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Build Docker image
+        run: docker build -t my-app .
+
+      - name: Run application
+        run: |
+          docker run -d -p 3000:3000 --name my-app my-app
+      
+      - name: Test application
+        run: |
+          sleep 2
+          curl http://localhost:3000
